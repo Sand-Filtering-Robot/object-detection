@@ -81,7 +81,7 @@ class ObjectDetection:
             # print top model confidences and frame rate
             if (debug):
                 # clear terminal screen
-                    os.system('clear')
+                    #os.system('clear')
 
                     # print detection status
                     detectedLock.acquire()
