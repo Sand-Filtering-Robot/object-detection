@@ -67,7 +67,7 @@ class ObjectDetection:
             # print model output
             predicted_labels_num = logits[0]['labels'][:10] # top 10 predicted outputs
             predicted_scores = logits[0]['scores'][:10] # top 10 predicted scores
-            predicted_labels = [self.weights.meta['categories'][i] for i in predicted_labels_num]
+            predicted_labels = [WEIGHTS.meta['categories'][i] for i in predicted_labels_num]
 
             # determine if there is a person inside the predictions
             detectedLock.acquire() # acquire detected lock
