@@ -74,6 +74,7 @@ class ObjectDetection:
             for i in range(len(predicted_labels)):
                 if (predicted_labels[i] == 'person') and (predicted_scores[i] > 0.5):
                     detected[0] = True
+                    break
                 else:
                     detected[0] = False
             detectedLock.release() # release the lock
