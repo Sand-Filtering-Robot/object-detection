@@ -4,7 +4,7 @@ import torch
 import torchvision
 from torchvision import models 
 from torchvision.transforms import v2
-from torchvision.models.detection import fasterrcnn_resnet50_fpn_v2, FasterRCNN_ResNet50_FPN_V2_Weights
+from torchvision.models.detection import ssdlite320_mobilenet_v3_large, SSDLite320_MobileNet_V3_Large_Weights
 from imagenet_classes import classes
 from env import verbose
 import time
@@ -23,13 +23,13 @@ picam2.start()
 
 # torch setup
 torch.backends.quantized.engine = 'qnnpack'
-weights = FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT
+weights = SSDLite320_MobileNet_V3_Large_Weights.DEFAULT
 
 # torch image preprocessing
 preprocess = weights.transforms()
 
 # mobile net
-detection_model = fasterrcnn_resnet50_fpn_v2(weights=weights).eval()
+detection_model = ssdlite320_mobilenet_v3_large(weights=weights).eval()
 
 # frame counting
 last_logged = time.time()
