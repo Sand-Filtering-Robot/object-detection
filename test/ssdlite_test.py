@@ -4,7 +4,7 @@ import torch
 import torchvision
 from torchvision import models 
 from torchvision.transforms import v2
-from imagenet_classes import classes
+from torchvision.models.detection import ssdlite320_mobilenet_v3_large, SSDLite320_MobileNet_V3_Large_Weights
 from env import verbose
 import time
 import os
@@ -21,18 +21,13 @@ picam2.start_preview(Preview.QTGL)
 picam2.start()
 
 # torch setup
-torch.backends.quantized.engine = 'qnnpack'
-weights = models.MobileNet_V3_Small_Weights.DEFAULT
+weights = SSDLite320_MobileNet_V3_Large_Weights.DEFAULT
 
 # torch image preprocessing
-process_raw = v2.Compose([
-    v2.PILToTensor(),
-    v2.ToDtype(torch.float32, scale=True)
-])
 preprocess = weights.transforms()
 
 # mobile net
-mobile_net = models.mobilenet_v3_small(weights=weights).eval()
+detection_model = ssdlite320_mobilenet_v3_large(weights=weights).eval()
 
 # frame counting
 last_logged = time.time()
@@ -57,18 +52,19 @@ with torch.no_grad():
         # run model :)
         if verbose:
             print('[INFO] running model...')
-        output = mobile_net(model_input)
+        output = detection_model(model_input)
 
         #time.sleep(DELAY)
 
         # print model output
-        top = list(enumerate(output[0].softmax(dim=0)))
-        top.sort(key=lambda x: x[1], reverse=True)
+        predicted_labels_num = output[0]['labels'][:10] # top 10 predicted outputs
+        predicted_scores = output[0]['scores'][:10] # top 10 predicted scores
+        predicted_labels = [weights.meta['categories'][i] for i in predicted_labels_num]
+
         os.system('clear')
-        for idx, val in top[:10]:
-            print(f'{val.item()*100:.2f}% {classes[idx]}')
-
-
+        for i in range(len(predicted_labels)):
+            print(f'{predicted_labels[i]}: {predicted_scores[i]}')
+        
         # log frame / performance
         frame_count += 1
         now = time.time()
