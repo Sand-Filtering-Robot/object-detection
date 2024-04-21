@@ -85,4 +85,5 @@ class ObjectDetection:
                         last_logged_frame_count = frame_count
                         frame_count = 0
 
+                time.sleep(1)
                 
