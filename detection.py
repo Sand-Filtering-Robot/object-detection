@@ -37,7 +37,8 @@ class ObjectDetection:
         # start the camera
         self.picam2.start()
 
-    def run_detection(self, debug=False):
+    
+    def run_detection(self, detected, detectedLock, debug=False):
         if (debug):
             # frame counting
             last_logged = time.time()
@@ -68,17 +69,33 @@ class ObjectDetection:
             predicted_scores = logits[0]['scores'][:10] # top 10 predicted scores
             predicted_labels = [self.weights.meta['categories'][i] for i in predicted_labels_num]
 
+            # determine if there is a person inside the predictions
+            detectedLock.acquire() # acquire detected lock
+            if (predicted_scores['person'] > 0.5):
+                detected[0] = True
+            else:
+                detected[0] = False
+            detectedLock.release() # release the lock
+
             # print top model confidences and frame rate
             if (debug):
-                os.system('clear')
-                for i in range(len(predicted_labels)):
-                    print(f'{predicted_labels[i]}: {predicted_scores[i] * 100:.1f}')
+                # clear terminal screen
+                    os.system('clear')
 
-                # log frame / performance
-                frame_count += 1
-                now = time.time()
-                print(f"{last_logged_frame_count} fps")
-                if (now - last_logged) > 1:
-                    last_logged = now
-                    last_logged_frame_count = frame_count
-                    frame_count = 0
+                    # print detection status
+                    detectedLock.acquire()
+                    print(f'PERSON DETECTED: {detected[0]}')
+                    detectedLock.release()
+
+                    # print top 5 scores
+                    for i in range(len(predicted_labels)):
+                        print(f'{predicted_labels[i]}: {predicted_scores[i] * 100:.1f}')
+
+                    # log frame / performance
+                    frame_count += 1
+                    now = time.time()
+                    print(f"{last_logged_frame_count} fps")
+                    if (now - last_logged) > 1:
+                        last_logged = now
+                        last_logged_frame_count = frame_count
+                        frame_count = 0
