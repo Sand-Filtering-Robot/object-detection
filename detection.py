@@ -44,45 +44,41 @@ class ObjectDetection:
             last_logged_frame_count = 0
             frame_count = 0
         
-        with torch.no_grad():
-            while True:
-                # capture PIL image using picamera
-                if (debug):
-                    print('[INFO] capturing image...')
-                raw_iamge = self.picam2.capture_image().convert(mode='RGB')
+        with torch.no_grad():                
+            # capture PIL image using picamera
+            if (debug):
+                print('[INFO] capturing image...')
+            raw_iamge = self.picam2.capture_image().convert(mode='RGB')
 
-                # preprocess the image
-                if (debug):
-                    print('[INFO] preprocessing image...')
-                input_image = self.preprocess(raw_iamge)
+            # preprocess the image
+            if (debug):
+                print('[INFO] preprocessing image...')
+            input_image = self.preprocess(raw_iamge)
 
-                # adjust to correct batch size = 1
-                input_image = input_image.unsqueeze(0)
+            # adjust to correct batch size = 1
+            input_image = input_image.unsqueeze(0)
 
-                # forward image through the model
-                if (debug):
-                    print('[INFO] forwarding through model...')
-                logits = self.model(input_image)
+            # forward image through the model
+            if (debug):
+                print('[INFO] forwarding through model...')
+            logits = self.model(input_image)
 
-                # print model output
-                predicted_labels_num = logits[0]['labels'][:10] # top 10 predicted outputs
-                predicted_scores = logits[0]['scores'][:10] # top 10 predicted scores
-                predicted_labels = [self.weights.meta['categories'][i] for i in predicted_labels_num]
+            # print model output
+            predicted_labels_num = logits[0]['labels'][:10] # top 10 predicted outputs
+            predicted_scores = logits[0]['scores'][:10] # top 10 predicted scores
+            predicted_labels = [self.weights.meta['categories'][i] for i in predicted_labels_num]
 
-                # print top model confidences and frame rate
-                if (debug):
-                    os.system('clear')
-                    for i in range(len(predicted_labels)):
-                        print(f'{predicted_labels[i]}: {predicted_scores[i] * 100:.1f}')
+            # print top model confidences and frame rate
+            if (debug):
+                os.system('clear')
+                for i in range(len(predicted_labels)):
+                    print(f'{predicted_labels[i]}: {predicted_scores[i] * 100:.1f}')
 
-                    # log frame / performance
-                    frame_count += 1
-                    now = time.time()
-                    print(f"{last_logged_frame_count} fps")
-                    if (now - last_logged) > 1:
-                        last_logged = now
-                        last_logged_frame_count = frame_count
-                        frame_count = 0
-
-                time.sleep(1)
-                
+                # log frame / performance
+                frame_count += 1
+                now = time.time()
+                print(f"{last_logged_frame_count} fps")
+                if (now - last_logged) > 1:
+                    last_logged = now
+                    last_logged_frame_count = frame_count
+                    frame_count = 0
