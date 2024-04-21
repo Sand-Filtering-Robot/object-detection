@@ -71,10 +71,11 @@ class ObjectDetection:
 
             # determine if there is a person inside the predictions
             detectedLock.acquire() # acquire detected lock
-            if (predicted_scores['person'] > 0.5):
-                detected[0] = True
-            else:
-                detected[0] = False
+            for i in range(len(predicted_labels)):
+                if (predicted_labels == 'person') and (predicted_scores[i] > 0.5):
+                    detected[0] = True
+                else:
+                    detected[0] = False
             detectedLock.release() # release the lock
 
             # print top model confidences and frame rate
