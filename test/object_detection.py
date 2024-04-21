@@ -59,8 +59,8 @@ with torch.no_grad():
         #time.sleep(DELAY)
 
         # print model output
-        predicted_labels_num = output['labels'][:10] # top 10 predicted outputs
-        predicted_scores = output['scores'][:10] # top 10 predicted scores
+        predicted_labels_num = output[0]['labels'][:10] # top 10 predicted outputs
+        predicted_scores = output[0]['scores'][:10] # top 10 predicted scores
         predicted_labels = [weights.meta['categories'][i] for i in predicted_labels_num]
 
         os.system('clear')
