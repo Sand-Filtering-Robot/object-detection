@@ -38,7 +38,7 @@ class ObjectDetection:
         self.picam2.start()
 
     
-    def run_detection(self, detected, detectedLock, debug=False):
+    def run_detection(self, detectedState, debug=False):
         if (debug):
             # frame counting
             last_logged = time.time()
@@ -70,14 +70,14 @@ class ObjectDetection:
             predicted_labels = [WEIGHTS.meta['categories'][i] for i in predicted_labels_num]
 
             # determine if there is a person inside the predictions
-            detectedLock.acquire() # acquire detected lock
+            detectedState['lock'].acquire() # acquire detected lock
             for i in range(len(predicted_labels)):
                 if (predicted_labels[i] == 'person') and (predicted_scores[i] > 0.5):
-                    detected[0] = True
+                    detectedState['state'] = True
                     break
                 else:
-                    detected[0] = False
-            detectedLock.release() # release the lock
+                    detectedState['state'] = False
+            detectedState['lock'].release() # release the lock
 
             # print top model confidences and frame rate
             if (debug):
@@ -85,9 +85,9 @@ class ObjectDetection:
                     os.system('clear')
 
                     # print detection status
-                    detectedLock.acquire()
-                    print(f'PERSON DETECTED: {detected[0]}')
-                    detectedLock.release()
+                    detectedState['lock'].acquire()
+                    print(f'PERSON DETECTED: {detectedState['state']}')
+                    detectedState['lock'].release()
 
                     # print top 5 scores
                     for i in range(len(predicted_labels)):
